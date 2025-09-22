@@ -207,7 +207,7 @@ if ARGS[1] == 'build' then
 	if fs.exists(destinationPath) then printError('"'..originPath..'": already exists.') return end
 
 	local scriptLines = getFileLines(originPath)
-	local dependencies = getScriptDependencies(getFileDirectory(originPath), scriptLines)
+	local dependencies, dependencyCount = getScriptDependencies(getFileDirectory(originPath), scriptLines)
 	for d,l in pairs(dependencies) do print("Found dependency: "..d) end
 
 	local outputLines = bundle(getFileNameExtension(originPath), scriptLines, dependencies)
@@ -219,7 +219,7 @@ if ARGS[1] == 'build' then
 	local outputFileSize = fs.getSize(destinationPath)
 
 	print('Generated bundled output at: '..destinationPath)
-	print('Bundle size: 1 script, '..#dependencies..' dependencies')
+	print('Bundle size: 1 script, '..dependencyCount..' dependencies')
 	print('File size: '..#outputLines..' lines ('..(outputFileSize / 1000)..' MB)')
 elseif not ARGS[1] or ARGS[1] == '' then
 	printError('Please specify a command')
