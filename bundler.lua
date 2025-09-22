@@ -181,7 +181,7 @@ local function bundle(scriptName, scriptLines, dependencies)
 		table.insert(outputLines, '-- Imported into '..scriptName..' with '..string.upper( INFO.NAME )..' --')
 		table.insert(outputLines, 'local function '..IMPORTED_LIBRARY_FUNCTION_NAME(libraryName)..'()'..'\n')
 		for il, libraryLine in ipairs(libraryLines) do
-			table.insert(outputLines, '	'..libraryLine) end
+			table.insert(outputLines, '    '..libraryLine) end
 		table.insert(outputLines, '\n'..'end')
 		table.insert(outputLines, IMPORTED_LIBRARY_INITIALIZATION(variableName, libraryName))
 		table.insert(outputLines, IMPORTED_LIBRARY_PERIMETER_PREFIX_END(libraryName)..'\n')
