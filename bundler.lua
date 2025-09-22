@@ -128,7 +128,7 @@ local function metadataString(data)
 
 	-- If the parameter is a table, we are building the metadata string
 	if type(data) == "table" then
-		return ('%s'..separator..'%s'..separator..'%s'..separator..'%s'):format(
+		return ('%s'..separator..'%s'..separator..'#%s'..separator..'%s'):format(
 			data.bundlerVersion,
 			data.bundlingDate,
 			data.bundlingComputerId,
