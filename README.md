@@ -1,10 +1,9 @@
 # CC:Tweaked LUA bundler
 Bundles a script and its dependencies (APIs and such, imported with `require()`)
 #### Note that:
-
 The bundling operation is not recursive, nested dependencies will be preserved: if script **A** `require`s script **B** and script **B** `require`s script **C**, when script **A** is bundled and script **B** is built into it, script **C** will still be required as an external file. To obtain a single file, script **C** would first need to be bundled in script **B**, before script **B** is built into script **A**.
 
-Only explicitly declared imports will be bundled:
+Also, only explicitly declared imports will be bundled:
 ```
 local lib = require("mylibrary")
 ```
@@ -14,7 +13,7 @@ local libname = "mylibrary"
 local lib = require(libname)
 ```
 ...will not.
-
+---
 
 ## How to use
 1. Import or download the `bundler.lua` script to a computer.
