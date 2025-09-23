@@ -198,29 +198,49 @@ end
 
 
 -- Command Line Interface
-if ARGS[1] == 'build' then
+if ARGS[1] == 'build' or ARGS[1] == 'test' then
+	-- Determine parameters
 	local originPath = ARGS[2]
 	local destinationPath = ARGS[3]
 
+	-- Check filesystem state
 	if (not fs.exists(originPath) or fs.isDir(originPath)) then printError('"'..originPath..'": file not found.') return end
 	if not destinationPath then destinationPath = DEFAULT_OUTPUT_PATH(getFileDirectory(originPath), getFileName(originPath)) end
 	if fs.exists(destinationPath) then printError('"'..originPath..'": already exists.') return end
 
+	-- Get script data
 	local scriptLines = getFileLines(originPath)
 	local dependencies, dependencyCount = getScriptDependencies(getFileDirectory(originPath), scriptLines)
 	for d,l in pairs(dependencies) do print("Found dependency: "..d) end
 
+	-- Create bundle
 	local outputLines = bundle(getFileNameExtension(originPath), scriptLines, dependencies)
 
-	local ofh = fs.open(destinationPath, 'w')
-	for i, line in ipairs(outputLines) do ofh.writeLine(line) end
-	ofh.close()
+	-- Run if testing, save if actually building
+	if ARGS[1] == 'build' then
+		-- Generate test function
+		local code = table.concat(outputLines)
+		local testfn = load(code)
+		if not testfn then printError('Testing failed: no test function was generated') return end
 
-	local outputFileSize = fs.getSize(destinationPath)
+		-- Run test function
+		local startTimeMs = os.epoch('utc')
+		testfn()
+		local endTimeMs = os.epoch('utc')
 
-	print('Generated bundled output at: '..destinationPath)
-	print('Bundle size: 1 script, '..dependencyCount..' dependencies')
-	print('File size: '..#outputLines..' lines ('..(outputFileSize / 1000)..' MB)')
+		-- Print output
+		print('Generated test function at: '..tostring(testfn):match(':%s*(.*)'))
+	else
+		-- Save file
+		local ofh = fs.open(destinationPath, 'w')
+		for i, line in ipairs(outputLines) do ofh.writeLine(line) end
+		ofh.close()
+
+		-- Print output
+		print('Generated bundled output at: '..destinationPath)
+		print('Bundle size: 1 script, '..dependencyCount..' dependencies')
+		print('File size: '..#outputLines..' lines ('..(fs.getSize(destinationPath) / 1000)..' MB)')
+	end
 elseif not ARGS[1] or ARGS[1] == '' then
 	printError('Please specify a command')
 else

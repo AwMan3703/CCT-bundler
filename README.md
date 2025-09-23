@@ -7,7 +7,10 @@ Bundles a script and its dependencies (APIs and such, imported with `require()`)
 4. You can now remove all dependencies from the computer — the bundled script will run fine on its own.
 
 ## Commands
-### `bundler build <file-path> <output-path>`
-Builds a bundle by looking for `require()` statements in the script at `<file-path>` and replacing them with the code they import from other files. The resulting script is then saved at `<output-path>`. Note that this operation is not recursive, nested dependencies will be preserved: if script **A** `require`s script **B** and script **B** `require`s script **C**, when script **A** is bundled and script **B** is built into it, script **C** will still be required as an external file. To obtain a single file, script **C** would first need to be bundled in script **B**, before script **B** is built into script **A**.
-- `<file-path>` The path of the script to bundle up.
-- `<output-path>` (OPTIONAL) The location to save the newly built bundle in. If this parameter is omitted, it defaults to the same directory as `<file-path>`, naming the new file "`<original-name>_bundled.lua`".
+### `bundler build <script-path> <output-path>`
+Builds a bundle by looking for `require()` statements in the script at `<script-path>` and replacing them with the code they import from other files. The resulting script is then saved at `<output-path>`. Note that this operation is not recursive, nested dependencies will be preserved: if script **A** `require`s script **B** and script **B** `require`s script **C**, when script **A** is bundled and script **B** is built into it, script **C** will still be required as an external file. To obtain a single file, script **C** would first need to be bundled in script **B**, before script **B** is built into script **A**.
+- `<script-path>` The path of the script to bundle up.
+- `<output-path>` (OPTIONAL) The location to save the newly built bundle in. If this parameter is omitted, it defaults to the same directory as `<script-path>`, naming the new file "`<original-name>_bundled.lua`".
+### `bundler test <script-path>`
+Temporarily builds and runs a bundle. This command is meant to test if your script would run when bundled, without creating new files.
+- `<script-path>` The path of the script to test.
