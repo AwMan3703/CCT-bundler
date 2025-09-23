@@ -3,16 +3,15 @@ Bundles a script and its dependencies (APIs and such, imported with `require()`)
 #### Note that:
 The bundling operation is not recursive, nested dependencies will be preserved: if script **A** `require`s script **B** and script **B** `require`s script **C**, when script **A** is bundled and script **B** is built into it, script **C** will still be required as an external file. To obtain a single file, script **C** would first need to be bundled in script **B**, before script **B** is built into script **A**.
 
-Also, only explicitly declared imports will be bundled:
+Furthermore, only explicitly declared imports will be bundled.
 ```
 local lib = require("mylibrary")
 ```
-The above dependency will be included, whereas...
+The above dependency will be included, whereas the following will not:
 ```
 local libname = "mylibrary"
 local lib = require(libname)
 ```
-...will not.
 
 
 
