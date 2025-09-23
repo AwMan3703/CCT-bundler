@@ -4,7 +4,7 @@ local INFO = {
 }
 local ARGS = {...}
 
-local DEFAULT_OUTPUT_PATH = function (path, name) return fs.combine(path, name..'_bundled.lua') end
+local DEFAULT_OUTPUT_PATH = function (path, name) return fs.combine(path or '', (name or 'script')..'_bundled.lua') end
 
 local IMPORTED_LIBRARY_PERIMETER_PREFIX_START = function (libraryName) return '-- '..INFO.NAME:upper()..' IMPORT START '..libraryName end
 local IMPORTED_LIBRARY_PERIMETER_PREFIX_END = function (libraryName) return '-- '..INFO.NAME:upper()..' IMPORT END '..libraryName end
@@ -22,7 +22,7 @@ local requirePatternUnvariabled = '^%s*require%s-[(]?%s-"(.-)"%s-[)]?'
 --
 -- Returns:
 -- The name portion of the url.
-local function getFileName(path) return path:match('[/](.-)%..-$') end
+local function getFileName(path) return path:match('([^/]-)%..-$') end
 
 -- Gets the name & extension portion of a file url.
 --
@@ -31,7 +31,7 @@ local function getFileName(path) return path:match('[/](.-)%..-$') end
 --
 -- Returns:
 -- The name & extension portion of the url.
-local function getFileNameExtension(path) return path:match('[/](.-)$') end
+local function getFileNameExtension(path) return path:match('([^/]-)$') end
 
 -- Gets the path portion of a file url.
 --
@@ -92,7 +92,7 @@ local function getScriptDependencies(scriptDirectory, scriptLines)
 	for i, line in ipairs(scriptLines) do
 		local variableName, dependencyName = extractRequireData(line)
 		if dependencyName then 
-			local dependencyLines = getFileLines(fs.combine(scriptDirectory, dependencyName:gsub('%.', '/')..'.lua'))
+			local dependencyLines = getFileLines(fs.combine(scriptDirectory or '', dependencyName:gsub('%.', '/')..'.lua'))
 			dependencies[dependencyName] = dependencyLines
 			dependenciesCount = dependenciesCount + 1
 		end
@@ -215,22 +215,26 @@ if ARGS[1] == 'build' or ARGS[1] == 'test' then
 
 	-- Create bundle
 	local outputLines = bundle(getFileNameExtension(originPath), scriptLines, dependencies)
+	print('Bundle assembled!')
 
 	-- Run if testing, save if actually building
-	if ARGS[1] == 'build' then
+	if ARGS[1] == 'test' then
 		-- Generate test function
-		local code = table.concat(outputLines)
-		local testfn = load(code)
-		if not testfn then printError('Testing failed: no test function was generated') return end
+		local code = table.concat(outputLines, '\n')
+		local testfn, error = load(code, originPath, 't')
+		if not testfn then printError('Testing failed: '..error) return end
 
 		-- Run test function
+		print('--- Running test bundle -----------\n')
 		local startTimeMs = os.epoch('utc')
 		testfn()
-		local endTimeMs = os.epoch('utc')
+		local elapsedMs = os.epoch('utc') - startTimeMs
+		print('\n-----------------------------------')
 
 		-- Print output
 		print('Generated test function at: '..tostring(testfn):match(':%s*(.*)'))
-	else
+		print('Test completed in: '..(elapsedMs / 1000)..' seconds')
+	elseif ARGS[1] == 'test' then
 		-- Save file
 		local ofh = fs.open(destinationPath, 'w')
 		for i, line in ipairs(outputLines) do ofh.writeLine(line) end
