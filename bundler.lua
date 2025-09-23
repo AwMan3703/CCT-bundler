@@ -226,36 +226,3 @@ elseif not ARGS[1] or ARGS[1] == '' then
 else
 	printError('Invalid command')
 end
-
---[[term.clear()
-term.setCursorPos(1,1)
-local test = bundle('myscript.lua',{
-		'testing 1',
-		'lib = require("testlib")',
-		'testing 2',
-		'lib.kms(1,2,3)',
-		'testing 3',
-		'local lib2 = require("secondlib")',
-		'testing 4',
-		'lib2.testfn()',
-		'done'
-	},{
-		['testlib'] = {
-			'this is testlib code!!!!',
-			'function testfunc(a,b,c)',
-			'	do stuff',
-			'end',
-			'return {kms = testfunc}',
-			'lmao'
-		},
-		['secondlib'] = {
-			'this is secondlib code!!!!1',
-			'return {',
-			'	testfn = function () print("tested") end',
-			'}'
-		}
-	})
-for i, line in ipairs(test) do print(line) end
-local fh = fs.open('output.lua', 'w')
-for i,line in ipairs(test) do fh.writeLine(line) end
-fh.close()]]
